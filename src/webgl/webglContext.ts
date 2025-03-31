@@ -13,6 +13,7 @@ export class WebGLContext {
 
   // add color multiplier
   colorMultiplier: vec3;
+  modelMatrixLocation: WebGLUniformLocation | null = null;
 
   constructor(
     canvasId: string,
@@ -40,6 +41,15 @@ export class WebGLContext {
 
     if (!this.shader.program) {
       throw new Error("Failed to initialize shader program.");
+    }
+    // get the uniform location
+    this.modelMatrixLocation = this.gl.getUniformLocation(
+      this.shader.program,
+      "uModelMatrix",
+    );
+
+    if (!this.modelMatrixLocation) {
+      console.warn("Uniform 'uModelMatrix' not found in shader.");
     }
   }
 
@@ -96,6 +106,14 @@ export class WebGLContext {
 
     this.gl.uniform3fv(colorMultiplierLocation, this.colorMultiplier);
 
+    // model matrix
+    if (this.modelMatrixLocation) {
+      this.gl.uniformMatrix4fv(
+        this.modelMatrixLocation,
+        false,
+        this.triangle.transform.matrix,
+      );
+    }
     this.gl.drawArrays(this.gl.TRIANGLES, 0, this.triangle.numVertices);
   }
   clear() {

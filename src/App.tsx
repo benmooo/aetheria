@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { WebGLContext } from "./webgl/webglContext";
-import ColorMultiplier from "./components/controls/ColorMultiplier";
+import ColorMultiplier from "./components/controls/ColorMultiplierController";
 import { ThemeProvider } from "./components/theme-provider";
+import TransformController from "./components/controls/TransformController";
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -12,9 +13,53 @@ function App() {
   const [width, setWidth] = useState(innerWidth);
   const [height, setHeight] = useState(innerHeight);
 
+  // transform
+  const [translationX, setTranslationX] = useState(0);
+  const [translationY, setTranslationY] = useState(0);
+  const [translationZ, setTranslationZ] = useState(0);
+  const [rotationX, setRotationX] = useState(0);
+  const [rotationY, setRotationY] = useState(0);
+  const [rotationZ, setRotationZ] = useState(0);
+  const [scaleX, setScaleX] = useState(1);
+  const [scaleY, setScaleY] = useState(1);
+  const [scaleZ, setScaleZ] = useState(1);
+
   const handleResize = () => {
     setWidth(innerWidth);
     setHeight(innerHeight);
+  };
+
+  const handleTransformChange = (values: {
+    translationX: number;
+    translationY: number;
+    translationZ: number;
+    rotationX: number;
+    rotationY: number;
+    rotationZ: number;
+    scaleX: number;
+    scaleY: number;
+    scaleZ: number;
+  }) => {
+    setTranslationX(values.translationX);
+    setTranslationY(values.translationY);
+    setTranslationZ(values.translationZ);
+    setRotationX(values.rotationX);
+    setRotationY(values.rotationY);
+    setRotationZ(values.rotationZ);
+    setScaleX(values.scaleX);
+    setScaleY(values.scaleY);
+    setScaleZ(values.scaleZ);
+  };
+  const handleResetTransform = () => {
+    setTranslationX(0);
+    setTranslationY(0);
+    setTranslationZ(0);
+    setRotationX(0);
+    setRotationY(0);
+    setRotationZ(0);
+    setScaleX(1);
+    setScaleY(1);
+    setScaleZ(1);
   };
 
   useEffect(() => {
@@ -27,16 +72,38 @@ function App() {
   useEffect(() => {
     if (!canvasRef.current) return;
 
+    console.log("transformation: ", {
+      translationX,
+      translationY,
+      translationZ,
+      rotationX,
+      rotationY,
+      rotationZ,
+      scaleX,
+      scaleY,
+      scaleZ,
+    });
     let webGLContext: WebGLContext | null = null;
     try {
       webGLContext = new WebGLContext(canvasRef.current.id); // 'webglCanvas'
 
       canvasRef.current.width = width;
       canvasRef.current.height = height;
-      webGLContext.gl.viewport(0, 0, width, height)
+      webGLContext.gl.viewport(0, 0, width, height);
+      webGLContext.colorMultiplier = [red, green, blue];
+      webGLContext.triangle.transform.translateX(translationX);
+      webGLContext.triangle.transform.translateY(translationY);
+      webGLContext.triangle.transform.translateZ(translationZ);
+      webGLContext.triangle.transform.rotateX(rotationX);
+      webGLContext.triangle.transform.rotateY(rotationY);
+      webGLContext.triangle.transform.rotateZ(rotationZ);
+      webGLContext.triangle.transform.scaleX(scaleX);
+      webGLContext.triangle.transform.scaleY(scaleY);
+      webGLContext.triangle.transform.scaleZ(scaleZ);
+
+
       const renderLoop = () => {
         if (webGLContext) {
-          webGLContext.colorMultiplier = [red, green, blue];
           webGLContext.render();
         }
         requestAnimationFrame(renderLoop);
@@ -48,7 +115,22 @@ function App() {
     }
 
     return () => {};
-  }, [red, green, blue, width, height]);
+  }, [
+    red,
+    green,
+    blue,
+    width,
+    height,
+    translationX,
+    translationY,
+    translationZ,
+    rotationX,
+    rotationY,
+    rotationZ,
+    scaleX,
+    scaleY,
+    scaleZ,
+  ]);
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
@@ -69,6 +151,20 @@ function App() {
             onGreenChange={setGreen}
             onBlueChange={setBlue}
           ></ColorMultiplier>
+
+          <TransformController
+            translationX={translationX}
+            translationY={translationY}
+            translationZ={translationZ}
+            rotationX={rotationX}
+            rotationY={rotationY}
+            rotationZ={rotationZ}
+            scaleX={scaleX}
+            scaleY={scaleY}
+            scaleZ={scaleZ}
+            onChange={handleTransformChange}
+            onReset={handleResetTransform}
+          ></TransformController>
         </div>
       </div>
     </ThemeProvider>
