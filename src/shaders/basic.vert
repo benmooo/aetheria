@@ -1,13 +1,18 @@
 #version 300 es
 
+precision highp float;
+
 layout(location = 0) in vec3 aPos; // vertext position
 layout(location = 1) in vec3 aColor; // vertex color
 
-out vec3 vColor; // colors passed to fragment shader
-uniform vec3 uColorMultiplier;
 uniform mat4 uModelMatrix;
+uniform mat4 uViewMatrix;
+uniform mat4 uProjectionMatrix;
+uniform vec3 uColorMultiplier;
+
+out vec3 vColor; // colors passed to fragment shader
 
 void main() {
-    gl_Position = uModelMatrix * vec4(aPos, 1.0);
     vColor = aColor * uColorMultiplier;
+    gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aPos, 1.0);
 }

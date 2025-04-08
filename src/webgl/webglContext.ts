@@ -4,6 +4,7 @@ import vertexShaderSource from "@/shaders/basic.vert?raw";
 import fragmentShaderSource from "@/shaders/basic.frag?raw";
 import { vec3 } from "gl-matrix";
 import { Cube } from "@/graphics/geometry/cube";
+import { Camera } from "@/graphics/camera/camera";
 
 export class WebGLContext {
   canvas: HTMLCanvasElement;
@@ -16,6 +17,10 @@ export class WebGLContext {
   // add color multiplier
   colorMultiplier: vec3;
   modelMatrixLocation: WebGLUniformLocation | null = null;
+
+  camera: Camera;
+  viewMatrixLocation: WebGLUniformLocation | null = null;
+  projectionMatrixLocation: WebGLUniformLocation | null = null;
 
   constructor(
     canvasId: string,
@@ -34,6 +39,16 @@ export class WebGLContext {
     this.triangle = new Triangle();
     this.cube = new Cube();
     this.colorMultiplier = colorMultiplier;
+
+    this.camera = new Camera(
+      vec3.fromValues(0, 0, 5),
+      vec3.fromValues(0, 0, 0),
+      vec3.fromValues(0, 1, 0),
+      Math.PI / 4,
+      this.canvas.width / this.canvas.height,
+      0.1,
+      100.0,
+    );
 
     this.initShaders();
     this.initBuffers();
@@ -54,6 +69,21 @@ export class WebGLContext {
     if (!this.modelMatrixLocation) {
       console.warn("Uniform 'uModelMatrix' not found in shader.");
     }
+
+    // get uniform locations for camera matrices
+    this.viewMatrixLocation = this.gl.getUniformLocation(
+      this.shader.program,
+      "uViewMatrix",
+    );
+
+    this.projectionMatrixLocation = this.gl.getUniformLocation(
+      this.shader.program,
+      "uProjectionMatrix",
+    );
+
+    if (!this.viewMatrixLocation || !this.projectionMatrixLocation) {
+      console.warn("Camera matrix uniforms not found in shader.");
+    }
   }
 
   async initBuffers() {
@@ -68,63 +98,15 @@ export class WebGLContext {
     );
   }
 
-  drawTriangle() {
-    if (!this.shader || !this.shader.program || !this.vertexBuffer) return;
-    this.shader.use();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-
-    const positionAttribLocation = this.gl.getAttribLocation(
-      this.shader.program,
-      "aPos",
-    );
-
-    this.gl.enableVertexAttribArray(positionAttribLocation);
-    this.gl.vertexAttribPointer(
-      positionAttribLocation,
-      3,
-      this.gl.FLOAT,
-      false,
-      6 * Float32Array.BYTES_PER_ELEMENT,
-      0,
-    );
-
-    const colorAttribLocation = this.gl.getAttribLocation(
-      this.shader.program,
-      "aColor",
-    );
-    this.gl.enableVertexAttribArray(colorAttribLocation);
-    this.gl.vertexAttribPointer(
-      colorAttribLocation,
-      3, // size (r, g, b)
-      this.gl.FLOAT, // type of data in buffer
-      false, // don't normalize
-      6 * Float32Array.BYTES_PER_ELEMENT, // stride: size of one vertex (position + color)
-      3 * Float32Array.BYTES_PER_ELEMENT, // offset: color starts after position
-    );
-
-    const colorMultiplierLocation = this.gl.getUniformLocation(
-      this.shader.program,
-      "uColorMultiplier",
-    );
-
-    this.gl.uniform3fv(colorMultiplierLocation, this.colorMultiplier);
-
-    // model matrix
-    if (this.modelMatrixLocation) {
-      this.gl.uniformMatrix4fv(
-        this.modelMatrixLocation,
-        false,
-        this.triangle.transform.matrix,
-      );
-    }
-    this.gl.drawArrays(this.gl.TRIANGLES, 0, this.triangle.numVertices);
-  }
-
   drawCube() {
     if (!this.shader || !this.shader.program || !this.vertexBuffer) return;
     this.shader.use();
 
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, this.cube.vertices, this.gl.STATIC_DRAW)
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      this.cube.vertices,
+      this.gl.STATIC_DRAW,
+    );
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
 
     const positionAttribLocation = this.gl.getAttribLocation(
@@ -172,15 +154,33 @@ export class WebGLContext {
         this.cube.transform.matrix,
       );
     }
+
+    if (this.viewMatrixLocation) {
+      this.gl.uniformMatrix4fv(
+        this.viewMatrixLocation,
+        false,
+        this.camera.viewMatrix,
+      );
+    }
+
+    if (this.projectionMatrixLocation) {
+      this.gl.uniformMatrix4fv(
+        this.projectionMatrixLocation,
+        false,
+        this.camera.projectionMatrix,
+      );
+    }
+
     this.gl.drawArrays(this.gl.TRIANGLES, 0, this.cube.numVertices);
   }
-
 
   clear() {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
   }
   resize() {
     this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    this.camera.aspect = this.canvas.width / this.canvas.height;
+    this.camera.updateProjectionMatrix();
   }
   render() {
     this.clear();

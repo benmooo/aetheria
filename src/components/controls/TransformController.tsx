@@ -168,7 +168,7 @@ const TransformController: React.FC<TransformControllerProps> = ({
 
   return (
     <div className="flex flex-col gap-2 p-4 border-1 rounded-md">
-      <label className="text-xs text-muted-foreground">Transform</label>
+      <label className="text-xs text-muted-foreground">Model Transform</label>
       <div className="grid gap-4">
         <div className="flex space-x-2">
           <Label htmlFor="translationX">Tx</Label>
@@ -281,8 +281,8 @@ const TransformController: React.FC<TransformControllerProps> = ({
       </div>
 
       <div className="flex justify-center mt-2">
-        <Button onClick={onReset} className="h-6">
-          Reset
+        <Button onClick={onReset} variant="outline" size="sm">
+          Reset Transform
         </Button>
       </div>
     </div>

@@ -3,6 +3,7 @@ import { WebGLContext } from "./webgl/webglContext";
 import ColorMultiplier from "./components/controls/ColorMultiplierController";
 import { ThemeProvider } from "./components/theme-provider";
 import TransformController from "./components/controls/TransformController";
+import CameraController from "./components/controls/CameraController";
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -23,6 +24,17 @@ function App() {
   const [scaleX, setScaleX] = useState(1);
   const [scaleY, setScaleY] = useState(1);
   const [scaleZ, setScaleZ] = useState(1);
+
+  // camera
+  const [positionX, setPositionX] = useState(-5);
+  const [positionY, setPositionY] = useState(5);
+  const [positionZ, setPositionZ] = useState(5);
+  const [targetX, setTargetX] = useState(0);
+  const [targetY, setTargetY] = useState(0);
+  const [targetZ, setTargetZ] = useState(0);
+  const [fov, setFov] = useState(Math.PI / 4); // 45 degrees
+  const [near, setNear] = useState(0.1);
+  const [far, setFar] = useState(100);
 
   const handleResize = () => {
     setWidth(innerWidth);
@@ -62,6 +74,40 @@ function App() {
     setScaleZ(1);
   };
 
+  const handleCameraChange = (values: {
+    positionX: number;
+    positionY: number;
+    positionZ: number;
+    targetX: number;
+    targetY: number;
+    targetZ: number;
+    fov: number;
+    near: number;
+    far: number;
+  }) => {
+    setPositionX(values.positionX);
+    setPositionY(values.positionY);
+    setPositionZ(values.positionZ);
+    setTargetX(values.targetX);
+    setTargetY(values.targetY);
+    setTargetZ(values.targetZ);
+    setFov(values.fov);
+    setNear(values.near);
+    setFar(values.far);
+  };
+
+  const handleResetCamera = () => {
+    setPositionX(0);
+    setPositionY(0);
+    setPositionZ(5);
+    setTargetX(0);
+    setTargetY(0);
+    setTargetZ(0);
+    setFov(Math.PI / 4);
+    setNear(0.1);
+    setFar(100);
+  };
+
   useEffect(() => {
     window.addEventListener("resize", handleResize);
     return () => {
@@ -90,6 +136,19 @@ function App() {
       webGLContext.cube.transform.scaleY(scaleY);
       webGLContext.cube.transform.scaleZ(scaleZ);
 
+      // Update camera properties
+      webGLContext.camera.position[0] = positionX;
+      webGLContext.camera.position[1] = positionY;
+      webGLContext.camera.position[2] = positionZ;
+      webGLContext.camera.target[0] = targetX;
+      webGLContext.camera.target[1] = targetY;
+      webGLContext.camera.target[2] = targetZ;
+      webGLContext.camera.fov = fov;
+      webGLContext.camera.near = near;
+      webGLContext.camera.far = far;
+      webGLContext.camera.aspect = width / height;
+      webGLContext.camera.updateViewMatrix();
+      webGLContext.camera.updateProjectionMatrix();
 
       const renderLoop = () => {
         if (webGLContext) {
@@ -154,6 +213,20 @@ function App() {
             onChange={handleTransformChange}
             onReset={handleResetTransform}
           ></TransformController>
+
+          <CameraController
+            positionX={positionX}
+            positionY={positionY}
+            positionZ={positionZ}
+            targetX={targetX}
+            targetY={targetY}
+            targetZ={targetZ}
+            fov={fov}
+            near={near}
+            far={far}
+            onChange={handleCameraChange}
+            onReset={handleResetCamera}
+          />
         </div>
       </div>
     </ThemeProvider>

@@ -1,6 +1,6 @@
 # Designing a Modular and Extensible Renderer System
 
-Absolutely! A modular and extensible renderer is crucial for a maintainable and feature-rich rendering engine. Let's outline a design that supports this.
+A modular and extensible renderer is crucial for a maintainable and feature-rich rendering engine. Let's outline a design that supports this.
 
 ## Goals
 
