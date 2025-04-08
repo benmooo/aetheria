@@ -3,12 +3,14 @@ import { Shader } from "../graphics/shader/shader";
 import vertexShaderSource from "@/shaders/basic.vert?raw";
 import fragmentShaderSource from "@/shaders/basic.frag?raw";
 import { vec3 } from "gl-matrix";
+import { Cube } from "@/graphics/geometry/cube";
 
 export class WebGLContext {
   canvas: HTMLCanvasElement;
   gl: WebGL2RenderingContext;
   shader: Shader | null = null;
   triangle: Triangle;
+  cube: Cube;
   vertexBuffer: WebGLBuffer | null = null;
 
   // add color multiplier
@@ -30,6 +32,7 @@ export class WebGLContext {
     this.gl.enable(this.gl.DEPTH_TEST); // Enable depth testing
 
     this.triangle = new Triangle();
+    this.cube = new Cube();
     this.colorMultiplier = colorMultiplier;
 
     this.initShaders();
@@ -60,7 +63,7 @@ export class WebGLContext {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
     this.gl.bufferData(
       this.gl.ARRAY_BUFFER,
-      this.triangle.vertices,
+      this.cube.vertices,
       this.gl.STATIC_DRAW,
     );
   }
@@ -116,6 +119,63 @@ export class WebGLContext {
     }
     this.gl.drawArrays(this.gl.TRIANGLES, 0, this.triangle.numVertices);
   }
+
+  drawCube() {
+    if (!this.shader || !this.shader.program || !this.vertexBuffer) return;
+    this.shader.use();
+
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, this.cube.vertices, this.gl.STATIC_DRAW)
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
+
+    const positionAttribLocation = this.gl.getAttribLocation(
+      this.shader.program,
+      "aPos",
+    );
+
+    this.gl.enableVertexAttribArray(positionAttribLocation);
+    this.gl.vertexAttribPointer(
+      positionAttribLocation,
+      3,
+      this.gl.FLOAT,
+      false,
+      9 * Float32Array.BYTES_PER_ELEMENT,
+      0,
+    );
+
+    const colorAttribLocation = this.gl.getAttribLocation(
+      this.shader.program,
+      "aColor",
+    );
+
+    this.gl.enableVertexAttribArray(colorAttribLocation);
+    this.gl.vertexAttribPointer(
+      colorAttribLocation,
+      3, // size (r, g, b)
+      this.gl.FLOAT, // type of data in buffer
+      false, // don't normalize
+      9 * Float32Array.BYTES_PER_ELEMENT, // stride: size of one vertex (position + normal + color)
+      6 * Float32Array.BYTES_PER_ELEMENT, // offset: color starts after position
+    );
+
+    const colorMultiplierLocation = this.gl.getUniformLocation(
+      this.shader.program,
+      "uColorMultiplier",
+    );
+
+    this.gl.uniform3fv(colorMultiplierLocation, this.colorMultiplier);
+
+    // model matrix
+    if (this.modelMatrixLocation) {
+      this.gl.uniformMatrix4fv(
+        this.modelMatrixLocation,
+        false,
+        this.cube.transform.matrix,
+      );
+    }
+    this.gl.drawArrays(this.gl.TRIANGLES, 0, this.cube.numVertices);
+  }
+
+
   clear() {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
   }
@@ -124,6 +184,7 @@ export class WebGLContext {
   }
   render() {
     this.clear();
-    this.drawTriangle();
+    // this.drawTriangle();
+    this.drawCube();
   }
 }

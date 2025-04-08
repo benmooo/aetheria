@@ -72,17 +72,6 @@ function App() {
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    console.log("transformation: ", {
-      translationX,
-      translationY,
-      translationZ,
-      rotationX,
-      rotationY,
-      rotationZ,
-      scaleX,
-      scaleY,
-      scaleZ,
-    });
     let webGLContext: WebGLContext | null = null;
     try {
       webGLContext = new WebGLContext(canvasRef.current.id); // 'webglCanvas'
@@ -91,15 +80,15 @@ function App() {
       canvasRef.current.height = height;
       webGLContext.gl.viewport(0, 0, width, height);
       webGLContext.colorMultiplier = [red, green, blue];
-      webGLContext.triangle.transform.translateX(translationX);
-      webGLContext.triangle.transform.translateY(translationY);
-      webGLContext.triangle.transform.translateZ(translationZ);
-      webGLContext.triangle.transform.rotateX(rotationX);
-      webGLContext.triangle.transform.rotateY(rotationY);
-      webGLContext.triangle.transform.rotateZ(rotationZ);
-      webGLContext.triangle.transform.scaleX(scaleX);
-      webGLContext.triangle.transform.scaleY(scaleY);
-      webGLContext.triangle.transform.scaleZ(scaleZ);
+      webGLContext.cube.transform.translateX(translationX);
+      webGLContext.cube.transform.translateY(translationY);
+      webGLContext.cube.transform.translateZ(translationZ);
+      webGLContext.cube.transform.rotateX(rotationX);
+      webGLContext.cube.transform.rotateY(rotationY);
+      webGLContext.cube.transform.rotateZ(rotationZ);
+      webGLContext.cube.transform.scaleX(scaleX);
+      webGLContext.cube.transform.scaleY(scaleY);
+      webGLContext.cube.transform.scaleZ(scaleZ);
 
 
       const renderLoop = () => {
