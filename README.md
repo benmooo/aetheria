@@ -12,48 +12,48 @@
 **Milestone 1: Core Rendering Engine**
 
 - **Task 1: Basic Geometry (Triangle)**
-  - [ ] Create `Triangle` class/function to define vertex data (position, color - initially hardcoded).
-  - [ ] Implement a function to create a vertex buffer object (VBO) and populate it with triangle vertex data.
-- [ ] Write a vertex shader:
-  - [ ] Includes vertex position and color attributes.
-  - [ ] Includes a **uniform variable for a color multiplier.**
-  - [ ] Pass vertex color to fragment shader.
-- [ ] Write a fragment shader:
-  - [ ] Receives interpolated color from vertex shader.
-  - [ ] Multiplies received color by the color multiplier uniform.
-  - [ ] Outputs the final color.
-- [ ] Create a shader program from the vertex and fragment shaders.
-- [ ] Implement a `drawTriangle` function that:
-  - [ ] Binds the VBO.
-  - [ ] Sets up attribute pointers for vertex position and color.
-  - [ ] **Gets the location of the color multiplier uniform.**
-  - [ ] **Sets the value of the color multiplier uniform (e.g., to white initially).**
-  - [ ] Uses `gl.drawArrays` to render the triangle.
-- [ ] Integrate `drawTriangle` into the main render loop in `App.tsx`.
-- [ ] **Add simple UI (e.g., a slider) to control the color multiplier uniform.**
+  - [x] Create `Triangle` class/function to define vertex data (position, color - initially hardcoded).
+  - [x] Implement a function to create a vertex buffer object (VBO) and populate it with triangle vertex data.
+- [x] Write a vertex shader:
+  - [x] Includes vertex position and color attributes.
+  - [x] Includes a **uniform variable for a color multiplier.**
+  - [x] Pass vertex color to fragment shader.
+- [x] Write a fragment shader:
+  - [x] Receives interpolated color from vertex shader.
+  - [x] Multiplies received color by the color multiplier uniform.
+  - [x] Outputs the final color.
+- [x] Create a shader program from the vertex and fragment shaders.
+- [x] Implement a `drawTriangle` function that:
+  - [x] Binds the VBO.
+  - [x] Sets up attribute pointers for vertex position and color.
+  - [x] **Gets the location of the color multiplier uniform.**
+  - [x] **Sets the value of the color multiplier uniform (e.g., to white initially).**
+  - [x] Uses `gl.drawArrays` to render the triangle.
+- [x] Integrate `drawTriangle` into the main render loop in `App.tsx`.
+- [x] **Add simple UI (e.g., a slider) to control the color multiplier uniform.**
 
 - **Task 2: Transformations (Translation)**
 
-  - [ ] Install `gl-matrix` (if not already done): `bun add gl-matrix`
-  - [ ] Add a uniform variable for the model matrix in the vertex shader.
-  - [ ] Create a `Transform` class/interface to hold translation, rotation, and scale.
-  - [ ] Implement a function to create a translation matrix using `gl-matrix`.
-  - [ ] Update the `drawTriangle` function to:
-    - [ ] Calculate the translation matrix based on the triangle's `Transform`.
-    - [ ] Upload the translation matrix to the uniform in the vertex shader.
-    - [ ] Multiply the vertex position by the model matrix in the vertex shader.
-  - [ ] Add UI (even basic text input) to control the triangle's translation.
+  - [x] Install `gl-matrix` (if not already done): `bun add gl-matrix`
+  - [x] Add a uniform variable for the model matrix in the vertex shader.
+  - [x] Create a `Transform` class/interface to hold translation, rotation, and scale.
+  - [x] Implement a function to create a translation matrix using `gl-matrix`.
+  - [x] Update the `drawTriangle` function to:
+    - [x] Calculate the translation matrix based on the triangle's `Transform`.
+    - [x] Upload the translation matrix to the uniform in the vertex shader.
+    - [x] Multiply the vertex position by the model matrix in the vertex shader.
+  - [x] Add UI (even basic text input) to control the triangle's translation.
 
 - **Task 3: Camera (Simple Perspective)**
 
-  - [ ] Create a `Camera` class to hold camera parameters (position, target, up vector, FOV, aspect ratio, near, far).
-  - [ ] Implement a function to create a perspective projection matrix using `gl-matrix`.
-  - [ ] Implement a function to create a view matrix using `gl-matrix` (camera transform).
-  - [ ] Add uniform variables for the projection and view matrices in the vertex shader.
-  - [ ] Calculate the projection and view matrices based on the camera parameters.
-  - [ ] Upload the projection and view matrices to the uniforms.
-  - [ ] Update the vertex shader to multiply the vertex position by the model, view, and projection matrices.
-  - [ ] Add UI to control camera position/rotation.
+  - [x] Create a `Camera` class to hold camera parameters (position, target, up vector, FOV, aspect ratio, near, far).
+  - [x] Implement a function to create a perspective projection matrix using `gl-matrix`.
+  - [x] Implement a function to create a view matrix using `gl-matrix` (camera transform).
+  - [x] Add uniform variables for the projection and view matrices in the vertex shader.
+  - [x] Calculate the projection and view matrices based on the camera parameters.
+  - [x] Upload the projection and view matrices to the uniforms.
+  - [x] Update the vertex shader to multiply the vertex position by the model, view, and projection matrices.
+  - [x] Add UI to control camera position/rotation.
 
 - **Task 4: Scene Graph (Basic)**
 

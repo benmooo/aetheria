@@ -3,19 +3,13 @@ import { mat4, vec3 } from "gl-matrix";
 
 export class Camera {
   position: vec3;
-
   target: vec3;
-
   up: vec3;
-
   fov: number;
   aspect: number;
   near: number;
-
   far: number;
-
   viewMatrix: mat4;
-
   projectionMatrix: mat4;
 
   constructor(
@@ -24,6 +18,7 @@ export class Camera {
     up = vec3.fromValues(0, 1, 0),
     fov = Math.PI / 4, // 45 degrees
     aspect = 1.0,
+
     near = 0.1,
     far = 100.0,
   ) {

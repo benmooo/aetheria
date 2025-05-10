@@ -150,14 +150,31 @@ function App() {
       webGLContext.camera.updateViewMatrix();
       webGLContext.camera.updateProjectionMatrix();
 
-      const renderLoop = () => {
+      let lastTime = 0;
+
+      const renderLoop = (time: number) => {
+        // calculate the delta
+        const delta = time - lastTime;
+        lastTime = time;
         if (webGLContext) {
+          // animate the cube
+
+          let radius = Math.sin(delta / 1000)
+          webGLContext.cube.transform.rotateZ(radius);
+          webGLContext.cube.transform.rotateX(radius);
+          webGLContext.cube.transform.rotateY(radius);
+
+          // translate the cube
+          webGLContext.cube.transform.translateX(Math.sin(time / 500));
+          webGLContext.cube.transform.translateY(Math.cos(time / 500));
+          webGLContext.cube.transform.translateZ(Math.cos(time / 500));
+
           webGLContext.render();
         }
         requestAnimationFrame(renderLoop);
       };
 
-      renderLoop();
+      renderLoop(lastTime);
     } catch (error) {
       console.error(error);
     }
@@ -178,6 +195,15 @@ function App() {
     scaleX,
     scaleY,
     scaleZ,
+    positionX,
+    positionY,
+    positionZ,
+    targetX,
+    targetY,
+    targetZ,
+    fov,
+    near,
+    far,
   ]);
 
   return (
